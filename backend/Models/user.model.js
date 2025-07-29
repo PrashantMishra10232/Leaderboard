@@ -18,10 +18,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  totalPoints: {
-    type: Number,
-    default: 0
-  },
+  refreshToken: String
 }, {
   timestamps: true
 });
