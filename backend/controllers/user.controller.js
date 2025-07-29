@@ -198,14 +198,19 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const addUser = asyncHandler(async(req,res)=>{
     const {name} = req.body;
+    const avatar = `https://ui-avatars.com/api/?name=${
+    name || "User".split(" ").join("+")
+  }&background=random&color=fff`;
+
     const createdUser = await LeaderBoardUser.create({
-        name
+        name,
+        avatar
     })
     return res.status(200).json(new ApiResponse(200,createdUser,"User get created"))
 })
 
 const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await LeaderBoardUser.find().sort({totalPoints:-1});
+  const users = await LeaderBoardUser.find().sort({totalPoints:-1, createdAt: 1});
 
   if (!users) {
     throw new ApiError(404, "No user found");
@@ -225,7 +230,7 @@ const claimPoints = asyncHandler(async(req,res)=>{
 
     const points = Math.floor((Math.random()*10)+1);
 
-    const claimedUser = await User.findByIdAndUpdate(claimedFor,{
+    const claimedUser = await LeaderBoardUser.findByIdAndUpdate(claimedFor,{
         $inc:{totalPoints: points},
         
     },{new : true})
@@ -246,4 +251,18 @@ const claimPoints = asyncHandler(async(req,res)=>{
 
 })
 
-export {registerUser,loginUser,refreshAccessToken,getAllUsers,logOut,claimPoints,addUser}
+const getUserHistory = asyncHandler(async(req,res)=>{
+    const userId = req.params.id;
+
+    const history = await History.find({claimedFor: userId})
+    .populate('claimedBy', 'name') 
+    .populate('claimedFor', 'name');
+
+    if(!history && history.length === 0){
+        throw new ApiError(404,"The user has no previous history")
+    }
+
+    return res.status(200).json(new ApiResponse(200,history,"User history"));
+})
+
+export {registerUser,loginUser,refreshAccessToken,getAllUsers,logOut,claimPoints,addUser,getUserHistory}
