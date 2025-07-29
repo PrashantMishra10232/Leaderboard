@@ -52,3 +52,15 @@ connectDB()
   .catch((err) => {
     console.log(err, "MongoDB Connection is failed");
   });
+
+
+import userRouter from "./Routes/user.routes.js"
+
+app.use("/api/v1/user",userRouter)
+
+app.use((err, req, res, next) => {
+  res.status(err.statusCode || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
