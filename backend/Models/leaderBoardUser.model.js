@@ -5,6 +5,10 @@ const leaderBoardUserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  avatar:{
+    type:String,
+    required:true
+  },
   totalPoints: {
     type: Number,
     default: 0
